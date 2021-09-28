@@ -11,35 +11,69 @@
 
 <body>
     <div id="app">
+        <custom-div type="header"></custom-div>
         <h2>{{ intro }}</h2>
+        <h3>Time on this app {{counter}}s</h3>
         <input type="text" v-model="intro">
         <h2 v-bind:title="info" v-bind:class="classObject">{{ title }}</h2>
         <h3 v-bind:class="classObject">Tasks done: {{totalDone}}</h3>
-        <button @click="reset()">RESET</button>
+        <button @click="reset()">RESET</button> <br> <br>
+
+        <form v-on:submit.prevent="addNewTodo">
+            <input v-model="newTodoText" id="new-todo" placeholder="New ToDO">
+            <button>Add new TODO</button>
+        </form>
         <ul>
-            <li v-for="element in array" :key="element.id">
-                <input type="checkbox" @click="taskUpdate(element.id)" name="task" :id="'checkbox' + element.id">
-                <span :id="'task' + element.id">{{element.id}}. {{element.title}} <span
-                        v-if="element.id%2 == 0">!</span></span>
-            </li>
+            <template v-for="(element, index) in array">
+                <li>
+                    <input type="checkbox" @click="taskUpdate(element.id)" name="task" :id="'checkbox' + element.id">
+                    <span :id="'task' + element.id">{{index+1}}. {{element.title}} <span
+                            v-if="element.id%2 == 0">!</span></span>
+                </li>
+            </template>
         </ul>
+        <alert-box>This is the end!</alert-box>
+        <custom-div type="footer"></custom-div>
+
     </div>
 
     <script src="https://unpkg.com/vue"></script>
     <script>
+        Vue.component('custom-div', {
+            props: ['type'],
+            template: '<h1 class="header">Component {{type}} reusable</h1>'
+        })
+
+        Vue.component('alert-box', {
+            template: `
+                <div class="alert-box">
+                <strong>ALERT!</strong>
+                <slot></slot>
+                </div>
+            `
+        })
+
         const app = new Vue({
             el: '#app',
             data: {
+                newTodoText: '',
                 intro: "Hello world!",
                 info: "this page was loaded on " + new Date().toLocaleString(),
                 array: [],
                 title: "Todo-list",
-                totalDone: 0
+                totalDone: 0,
+                counter: 0
+            },
+            mounted() {
+                setInterval(() => {
+                    this.counter++
+                }, 1000)
             },
             created() {
                 fetch("https://jsonplaceholder.typicode.com/todos/")
                     .then(response => response.json())
-                    .then(json => this.array = json)
+                    .then(json => json.slice(0, 15))
+                    .then(slicedArray => this.array = slicedArray)
             },
             methods: {
                 taskUpdate: function (id) {
@@ -59,6 +93,14 @@
                         document.getElementById(`checkbox${element.id}`).checked = false;
                         document.getElementById(`task${element.id}`).style.textDecoration = "none"
                     }
+                },
+                addNewTodo: function () {
+                    let newTodo = {
+                        title: this.newTodoText,
+                        id: this.array.length
+                    }
+                    this.array.push(newTodo);
+
                 }
 
             },
