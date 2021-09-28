@@ -37,7 +37,7 @@
 
     </div>
 
-    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue@next"></script>
     <script>
         Vue.component('custom-div', {
             props: ['type'],
@@ -97,10 +97,10 @@
                 addNewTodo: function () {
                     let newTodo = {
                         title: this.newTodoText,
-                        id: this.array.length
+                        id: (this.array.length) + 1
                     }
+                    this.newTodoText = ''
                     this.array.push(newTodo);
-
                 }
 
             },
