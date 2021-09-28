@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <h2>{{ intro }}</h2>
+        <input type="text" v-model="intro">
+        <h2 v-bind:title="info" v-bind:class="classObject">{{ title }}</h2>
+        <h3 v-bind:class="classObject">Tasks done: {{totalDone}}</h3>
+        <button @click="reset()">RESET</button>
+        <ul>
+            <li v-for="element in array" :key="element.id">
+                <input type="checkbox" @click="taskUpdate(element.id)" name="task" :id="'checkbox' + element.id">
+                <span :id="'task' + element.id">{{element.id}}. {{element.title}} <span
+                        v-if="element.id%2 == 0">!</span></span>
+            </li>
+        </ul>
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                intro: "Hello world!",
+                info: "this page was loaded on " + new Date().toLocaleString(),
+                array: [],
+                title: "Todo-list",
+                totalDone: 0
+            },
+            created() {
+                fetch("https://jsonplaceholder.typicode.com/todos/")
+                    .then(response => response.json())
+                    .then(json => this.array = json)
+            },
+            methods: {
+                taskUpdate: function (id) {
+                    this.info = "this page was updated at " + new Date().toLocaleString();
+                    if (document.getElementById(`checkbox${id}`).checked) {
+                        document.getElementById(`task${id}`).style.textDecoration = "line-through"
+                        this.totalDone++;
+                    } else {
+                        document.getElementById(`task${id}`).style.textDecoration = "none"
+                        this.totalDone--;
+                    }
+                },
+                reset: function () {
+                    this.totalDone = 0;
+                    for (let index = 0; index < this.array.length; index++) {
+                        const element = this.array[index];
+                        document.getElementById(`checkbox${element.id}`).checked = false;
+                        document.getElementById(`task${element.id}`).style.textDecoration = "none"
+                    }
+                }
+
+            },
+            computed: {
+                classObject: function () {
+                    return {
+                        red: this.totalDone < 5,
+                        orange: this.totalDone >= 5 && this.totalDone < 10,
+                        green: this.totalDone >= 10
+                    }
+                }
+            }
+
+        })
+    </script>
+</body>
+
+</html>
