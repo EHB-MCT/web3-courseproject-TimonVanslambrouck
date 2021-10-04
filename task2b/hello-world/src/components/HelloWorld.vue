@@ -1,58 +1,137 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <div id="app">
+        <Header type="header"/>
+        <Alertbox>This is the beginning!</Alertbox>
+        <h2>{{ intro }}</h2>
+        <h3>Time on this app {{counter}}s</h3>
+        <input type="text" v-model="intro">
+        <h2 v-bind:title="info" v-bind:class="classObject">{{ title }}</h2>
+        <h3 v-bind:class="classObject">Tasks done: {{totalDone}}</h3>
+        <button @click="reset()">RESET</button> <br> <br>
+
+        <form v-on:submit.prevent="addNewTodo">
+            <input v-model="newTodoText" id="new-todo" placeholder="New ToDO">
+            <button>Add new TODO</button>
+        </form>
+        <ul>
+                  <li v-for="(element, index) in array" :key="element.id">
+                      <input type="checkbox" @click="taskUpdate(element.id)" name="task" :id="'checkbox' + element.id">
+                      <span :id="'task' + element.id">{{index+1}}. {{element.title}} <span
+                              v-if="element.id%2 == 0">!</span></span>
+                  </li>
+        </ul>
+        <Alertbox>This is the end!</Alertbox>
+        <Header type="footer"/>
+
+    </div>
 </template>
 
 <script>
+import Header from './Header.vue';
+import Alertbox from './Alertbox.vue';
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+    name: 'HelloWorld',
+    components: {
+        Header,
+        Alertbox
+    },
+    props: {
+        msg: String
+    },
+    data() {
+        return {
+            newTodoText: '',
+            intro: "Hello world!",
+            info: "this page was loaded on " + new Date().toLocaleString(),
+            array: [],
+            title: "Todo-list",
+            totalDone: 0,
+            counter: 0
+        }
+    },
+    mounted() {
+        setInterval(() => {
+            this.counter++
+        }, 1000)
+    },
+
+    created() {
+        fetch("https://jsonplaceholder.typicode.com/todos/")
+            .then(response => response.json())
+            .then(json => json.slice(0, 15))
+            .then(slicedArray => this.array = slicedArray)
+    },
+    methods: {
+        taskUpdate: function (id) {
+            this.info = "this page was updated at " + new Date().toLocaleString();
+            if (document.getElementById(`checkbox${id}`).checked) {
+                document.getElementById(`task${id}`).style.textDecoration = "line-through"
+                this.totalDone++;
+            } else {
+                document.getElementById(`task${id}`).style.textDecoration = "none"
+                this.totalDone--;
+            }
+        },
+        reset: function () {
+            this.totalDone = 0;
+            for (let index = 0; index < this.array.length; index++) {
+                const element = this.array[index];
+                document.getElementById(`checkbox${element.id}`).checked = false;
+                document.getElementById(`task${element.id}`).style.textDecoration = "none"
+            }
+        },
+        addNewTodo: function () {
+            let newTodo = {
+                title: this.newTodoText,
+                id: (this.array.length) + 1
+            }
+            this.newTodoText = ''
+            this.array.push(newTodo);
+        }
+
+    },
+    computed: {
+        classObject: function () {
+            return {
+                red: this.totalDone < 5,
+                orange: this.totalDone >= 5 && this.totalDone < 10,
+                green: this.totalDone >= 10
+            }
+        }
+    }
+
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
+
 li {
-  display: inline-block;
-  margin: 0 10px;
+    list-style: none;
 }
-a {
-  color: #42b983;
+
+.header {
+    text-align: center;
+    background-color: black;
+    color: white;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.red {
+    color: red;
+}
+
+.orange {
+    color: orange;
+}
+
+.green {
+    color: green;
 }
 </style>
