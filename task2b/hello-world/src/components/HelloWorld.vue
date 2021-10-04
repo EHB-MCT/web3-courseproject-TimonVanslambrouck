@@ -1,7 +1,6 @@
 <template>
   <div id="app">
         <Header type="header"/>
-        <Alertbox>This is the beginning!</Alertbox>
         <h2>{{ intro }}</h2>
         <h3>Time on this app {{counter}}s</h3>
         <input type="text" v-model="intro">
@@ -21,7 +20,6 @@
                   </li>
         </ul>
         <Alertbox>This is the end!</Alertbox>
-        <Header type="footer"/>
 
     </div>
 </template>

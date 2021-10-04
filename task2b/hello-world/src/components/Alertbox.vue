@@ -15,6 +15,9 @@ export default {
 <style scoped>
 .alert-box {
     background-color: red;
+    color: white;
     margin: 15px;
+    width: 30%;
+    margin-left: 35%;
 }
 </style>
