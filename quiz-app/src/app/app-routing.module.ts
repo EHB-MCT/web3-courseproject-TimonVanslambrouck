@@ -1,7 +1,9 @@
+import { QuestionsComponent } from './questions/questions.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
+  {path: '', component: QuestionsComponent}
 ];
 
 @NgModule({
