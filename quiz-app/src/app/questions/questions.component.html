@@ -7,28 +7,27 @@
   </div>
   <div class="md:w-auto py-4 px-8 bg-gray-100 shadow-lg rounded-lg ">
     <div>
-      <h2 class="text-gray-800 p-5 text-3xl font-semibold text-center">Lorem ipsum dolor sit amet, consectetur
-        adipisicing
-        elit?</h2>
-      <div (click)="submitAnswer(1)"
+      <h2 class="text-gray-800 p-5 text-3xl font-semibold text-center">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit?</h2>
+      <div (click)="submitAnswer(1)" *ngIf="showAnswer[0]"
         class="cursor-pointer w-full py-4 px-8 bg-white shadow-lg rounded-lg mb-2 hover:bg-blue-200">
         <div>
           <p class="mt-2 text-gray-600">A. Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
         </div>
       </div>
-      <div (click)="submitAnswer(2)"
+      <div (click)="submitAnswer(2)" *ngIf="showAnswer[1]"
         class="cursor-pointer w-full py-4 px-8 bg-white shadow-lg rounded-lg mb-2 hover:bg-blue-200">
         <div>
           <p class="mt-2 text-gray-600">B. Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
         </div>
       </div>
-      <div (click)="submitAnswer(3)"
+      <div (click)="submitAnswer(3)" *ngIf="showAnswer[2]"
         class="cursor-pointer w-full py-4 px-8 bg-white shadow-lg rounded-lg mb-2 hover:bg-blue-200">
         <div>
           <p class="mt-2 text-gray-600">C. Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
         </div>
       </div>
-      <div (click)="submitAnswer(4)"
+      <div (click)="submitAnswer(4)" *ngIf="showAnswer[3]"
         class="cursor-pointer w-full py-4 px-8 bg-white shadow-lg rounded-lg mb-5 hover:bg-blue-200">
         <div>
           <p class="mt-2 text-gray-600">D. Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
