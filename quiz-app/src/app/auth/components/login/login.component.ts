@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit {
     console.log(f.valid);  // false
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
 }

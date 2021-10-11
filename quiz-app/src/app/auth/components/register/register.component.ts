@@ -8,14 +8,16 @@ import { NgForm } from '@angular/forms';
 })
 export class RegisterComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+  ) {}
 
   onSubmit(f: NgForm) {
-    console.log(f.value);  // { first: '', last: '' }
-    console.log(f.valid);  // false
+    console.log(f.value); // { first: '', last: '' }
+    console.log(f.valid); // false
+   
   }
 
   ngOnInit(): void {
   }
 
-}
+  }
