@@ -1,6 +1,8 @@
+import { WebsocketService } from './../websocket.service';
 import { QuestionsService } from './../questions.service';
 import { Component, OnInit } from '@angular/core';
 import { IQuestion } from '../question';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -10,38 +12,45 @@ import { IQuestion } from '../question';
 })
 export class QuestionsComponent implements OnInit {
 
-  constructor(private questionService: QuestionsService) { }
-
+  constructor(
+    private questionService: QuestionsService,
+    private websocketService: WebsocketService,
+    private route: ActivatedRoute,
+    ) { }
+    
+    public timerDone = false;
+  private name:string = this.route.snapshot.params.name;
   public dataLoaded = false;
   public currentQuestion = {} as any;
   private currenQuestionNumber = 0;
-  public time = 30;
+  private score = 0;
+  public scores:string[] = [];
+  public time = 15;
   public showAnswer = [true, true, true, true, true ,true]
-  public showLate = false;
   public questionList!: IQuestion[];
 
   timerFunction() {
     setTimeout(() => {
       if (this.time == 0) {
         if (this.allEqual(this.showAnswer)) {
-          this.timerFinished();
+          this.websocketService.sendData(`score ${this.score}`);
         }
         this.currenQuestionNumber++;
+        this.timerDone = true;
       } else {
         this.time--;
         this.timerFunction();
       }
     }, 1000);
   }
-  timerFinished() {
-    this.showAnswer = [false, false, false, false, false, false];
-    this.showLate = true;
-  }
 
-  submitAnswer(answer: number) {
-    console.log("user chose answer " + answer);
+  submitAnswer(answer: number, answerString:string) {
     this.showAnswer = [false, false, false, false, false, false];
     this.showAnswer[answer - 1] = true;
+    if (this.currentQuestion.correct_answer == answerString) {
+      this.score++;      
+    }
+    this.websocketService.sendData(`score ${this.name}: ${this.score}`);
   }
 
   allEqual(array: boolean[]) {
@@ -49,17 +58,18 @@ export class QuestionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.scores=this.websocketService.scores;
     this.questionService.getQuestions()
     .subscribe(
       (data) => {
-        this.questionList = data
+        this.questionList = data;
+        console.log(data);
         this.startQuiz()
         
       }
     )
   }
   startQuiz() {
-    console.log(this.questionList);
     this.currentQuestion = this.questionList[this.currenQuestionNumber];
     this.dataLoaded = true;
     this.timerFunction();
