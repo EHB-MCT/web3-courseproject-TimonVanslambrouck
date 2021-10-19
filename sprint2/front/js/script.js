@@ -1,82 +1,94 @@
 const scene = new THREE.Scene();
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 2, 4);
 camera.rotation.x = -0.5;
+guiSettings(camera, 'camera');
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({
-    color: 0x00ff00
-});
-const cube = new THREE.Mesh(geometry, material);
-cube.position.set(0, 0.5, 1)
-scene.add(cube);
 
-window.addEventListener('keydown', function (event) {
-    const KEY = event.key;
-    switch (KEY) {
-        case 'ArrowUp':
-        case 'z':
-            console.log('up');
-            if (cube.position.z > -4.5) {
-                cube.position.z -= 0.1;
-            }
-            break;
-        case 'ArrowDown':
-        case 's':
-            console.log('down');
-            if (cube.position.z < 4.5) {
-                cube.position.z += 0.1;
-            }
-            break;
-        case 'ArrowLeft':
-        case 'q':
-            console.log('left');
-            if (cube.position.x > -4.5) {
-                cube.position.x -= 0.1;
-            }
-            break;
-        case 'ArrowRight':
-        case 'd':
-            console.log('right');
-            if (cube.position.x < 4.5) {
-                cube.position.x += 0.1;
-            }
-            break;
 
-        default:
-            console.log('none');
-            break;
-    }
-})
+
+addCube(1, scene, 0x00ff00, [0, 0.5, 1]);
+addWorld();
+animate();
+addPlane();
+
+function addCube(size, scene, color, position) {
+    const geometry = new THREE.BoxGeometry(size, size, size);
+    const material = new THREE.MeshBasicMaterial({
+        color: color
+    });
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.set(position[0], position[1], position[2])
+    scene.add(cube);
+    controlKeyboard(cube);
+    guiSettings(cube, 'Cube');
+}
+
+function controlKeyboard(object) {
+    window.addEventListener('keydown', function (event) {
+        const KEY = event.key;
+        switch (KEY) {
+            case 'ArrowUp':
+            case 'z':
+                console.log('up');
+                if (object.position.z > -4.5) {
+                    object.position.z -= 0.1;
+                }
+                break;
+            case 'ArrowDown':
+            case 's':
+                console.log('down');
+                if (object.position.z < 4.5) {
+                    object.position.z += 0.1;
+                }
+                break;
+            case 'ArrowLeft':
+            case 'q':
+                console.log('left');
+                if (object.position.x > -4.5) {
+                    object.position.x -= 0.1;
+                }
+                break;
+            case 'ArrowRight':
+            case 'd':
+                console.log('right');
+                if (object.position.x < 4.5) {
+                    object.position.x += 0.1;
+                }
+                break;
+
+            default:
+                console.log('none');
+                break;
+        }
+    })
+}
+
+
 
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
 }
 
-function guiSettings() {
-    const axesHelper = new THREE.AxesHelper(5);
-    scene.add(axesHelper);
+function guiSettings(object, name) {
     const gui = new dat.GUI();
-    const cubeFolder = gui.addFolder('Cube');
-    cubeFolder.add(cube.position, 'x', 0, Math.PI * 2).listen();
-    cubeFolder.add(cube.position, 'y', 0, Math.PI * 2).listen();
-    cubeFolder.add(cube.position, 'z', 0, Math.PI * 2).listen();
-    cubeFolder.open();
-    const cameraFolder = gui.addFolder('Camera');
-    cameraFolder.add(camera.position, 'z', 0, 100).listen();
-    cameraFolder.add(camera.position, 'x', 0, 100).listen();
-    cameraFolder.add(camera.position, 'y', 0, 100).listen();
-    cameraFolder.add(camera.rotation, 'x', -5, 5).listen();
-    cameraFolder.add(camera.rotation, 'y', -5, 5).listen();
-    cameraFolder.add(camera.rotation, 'z', -5, 5).listen();
+    const cameraFolder = gui.addFolder(name);
+    cameraFolder.add(object.position, 'z', 0, 100).listen();
+    cameraFolder.add(object.position, 'x', 0, 100).listen();
+    cameraFolder.add(object.position, 'y', 0, 100).listen();
+    cameraFolder.add(object.rotation, 'x', -5, 5).listen();
+    cameraFolder.add(object.rotation, 'y', -5, 5).listen();
+    cameraFolder.add(object.rotation, 'z', -5, 5).listen();
 }
 
 function addPlane() {
-    const groundGeometry = new THREE.PlaneGeometry(50, 50);
+    const groundGeometry = new THREE.PlaneGeometry(10, 10);
     const groundMaterial = new THREE.MeshBasicMaterial({
         color: 0xffff00,
         side: THREE.DoubleSide
@@ -95,7 +107,3 @@ function addWorld() {
     const worldCube = new THREE.Mesh(worldGeometry, worldMaterial);
     scene.add(worldCube);
 }
-addWorld();
-animate();
-guiSettings();
-addPlane();
