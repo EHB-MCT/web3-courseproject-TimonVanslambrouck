@@ -20,22 +20,30 @@ window.addEventListener('keydown', function (event) {
         case 'ArrowUp':
         case 'z':
             console.log('up');
-            cube.position.z -= 0.1
+            if (cube.position.z > -4.5) {
+                cube.position.z -= 0.1;
+            }
             break;
         case 'ArrowDown':
         case 's':
             console.log('down');
-            cube.position.z += 0.1
+            if (cube.position.z < 4.5) {
+                cube.position.z += 0.1;
+            }
             break;
         case 'ArrowLeft':
         case 'q':
             console.log('left');
-            cube.position.x -= 0.1
+            if (cube.position.x > -4.5) {
+                cube.position.x -= 0.1;
+            }
             break;
         case 'ArrowRight':
         case 'd':
             console.log('right');
-            cube.position.x += 0.1
+            if (cube.position.x < 4.5) {
+                cube.position.x += 0.1;
+            }
             break;
 
         default:
@@ -54,9 +62,9 @@ function guiSettings() {
     scene.add(axesHelper);
     const gui = new dat.GUI();
     const cubeFolder = gui.addFolder('Cube');
-    cubeFolder.add(cube.rotation, 'x', 0, Math.PI * 2).listen();
-    cubeFolder.add(cube.rotation, 'y', 0, Math.PI * 2).listen();
-    cubeFolder.add(cube.rotation, 'z', 0, Math.PI * 2).listen();
+    cubeFolder.add(cube.position, 'x', 0, Math.PI * 2).listen();
+    cubeFolder.add(cube.position, 'y', 0, Math.PI * 2).listen();
+    cubeFolder.add(cube.position, 'z', 0, Math.PI * 2).listen();
     cubeFolder.open();
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(camera.position, 'z', 0, 100).listen();
