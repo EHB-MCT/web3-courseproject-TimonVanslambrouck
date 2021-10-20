@@ -1,3 +1,5 @@
+import * as THREE from '/build/three.module.js';
+
 const scene = new THREE.Scene();
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
@@ -8,6 +10,7 @@ camera.rotation.x = -0.5;
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+const gltfLoader = new THREE.GLTFLoader();
 
 const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 3);
 scene.add(light);
@@ -16,16 +19,40 @@ scene.add(light);
 addWorld();
 animate();
 addPlane();
+addModel('./assets/scene.gltf', 0.005, [0, 0, 0]);
 
-const gltfLoader = new THREE.GLTFLoader();
-gltfLoader.load('./assets/scene.gltf', function (gltf) {
-    const object = gltf.scene;
-    object.scale.set(0.005, 0.005, 0.005);
-    object.position.set(0, 0, 0)
-    scene.add(object);
-    controlKeyboard(object);
+import geckos from '@geckos.io/client'
 
-});
+// or add a minified version to your index.html file
+// https://github.com/geckosio/geckos.io/tree/master/bundles
+
+const channel = geckos({
+    port: 3000
+}) // default port is 9208
+
+channel.onConnect(error => {
+    if (error) {
+        console.error(error.message)
+        return
+    }
+
+    channel.on('chat message', data => {
+        console.log(`You got the message ${data}`)
+    })
+
+    channel.emit('chat message', 'a short message sent to the server')
+})
+
+function addModel(path, scale, position) {
+    gltfLoader.load(path, function (gltf) {
+        const object = gltf.scene;
+        object.scale.set(scale, scale, scale);
+        object.position.set(position[0], position[1], position[2])
+        scene.add(object);
+        controlKeyboard(object);
+
+    });
+}
 
 function addCube(size, scene, color, position) {
     const geometry = new THREE.BoxGeometry(size, size, size);
