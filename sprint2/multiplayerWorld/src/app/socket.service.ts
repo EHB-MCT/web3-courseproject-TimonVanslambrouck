@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import geckos from '@geckos.io/client'
+import geckos, {Data} from '@geckos.io/client'
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
 
+  public users = [];
   private channel = geckos({ port: 8081 }) // default port is 9208
 
   constructor(
@@ -15,12 +16,21 @@ export class SocketService {
         console.error(error.message)
         return
       }
+      this.channel.emit('get users', this.users);
+      const user = {
+        user: this.channel.id,
+        positionX: 0,
+        positionY: 0
+      }
+
+      this.channel.emit('add user', user)
     
-      this.channel.on('chat message', data => {
+      this.channel.on('chat message', (data:Data) => {
         console.log(`You got the message ${data}`)
+        if (data == 'new user added') {
+          this.channel.emit('get users', this.users);
+        }
       })
-    
-      this.channel.emit('chat message', 'a short message sent to the server')
     })
    }
 

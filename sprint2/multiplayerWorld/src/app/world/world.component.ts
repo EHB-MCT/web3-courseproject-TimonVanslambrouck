@@ -11,6 +11,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 })
 export class WorldComponent implements OnInit {
 
+  private users = [];
+
   constructor(
     private socketService: SocketService
   ) {}
@@ -27,6 +29,9 @@ export class WorldComponent implements OnInit {
 
 
   ngOnInit(): void {
+    window.addEventListener('resize', function (){
+      this.location.reload();
+    })
     this.renderer.render(this.scene, this.camera);
     this.scene.add(this.axesHelper);
     this.camera.position.set(0, 2, 4);
