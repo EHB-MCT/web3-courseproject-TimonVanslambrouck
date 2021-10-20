@@ -1,5 +1,6 @@
+import { SocketService } from './../socket.service';
 import { Component, OnInit } from '@angular/core';
-import * as dat from 'dat.gui';
+// import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
@@ -10,7 +11,11 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 })
 export class WorldComponent implements OnInit {
 
-  constructor() {}
+  constructor(
+    private socketService: SocketService
+  ) {}
+
+  
 
   private scene = new THREE.Scene();
   private axesHelper = new THREE.AxesHelper(5);

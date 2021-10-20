@@ -6,6 +6,7 @@ const PORT = 8081;
 io.listen(PORT) // default port is 9208
 
 io.onConnection(channel => {
+    console.log(`${channel.id} connected`)
     channel.onDisconnect(() => {
         console.log(`${channel.id} got disconnected`)
     })
