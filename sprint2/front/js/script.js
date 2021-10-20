@@ -4,18 +4,28 @@ scene.add(axesHelper);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 2, 4);
 camera.rotation.x = -0.5;
-guiSettings(camera, 'camera');
+// guiSettings(camera, 'camera');
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 3);
+scene.add(light);
 
-
-
-addCube(1, scene, 0x00ff00, [0, 0.5, 1]);
+// addCube(1, scene, 0x00ff00, [0, 0.5, 0.5]);
 addWorld();
 animate();
 addPlane();
+
+const gltfLoader = new THREE.GLTFLoader();
+gltfLoader.load('./assets/scene.gltf', function (gltf) {
+    const object = gltf.scene;
+    object.scale.set(0.005, 0.005, 0.005);
+    object.position.set(0, 0, 0)
+    scene.add(object);
+    controlKeyboard(object);
+
+});
 
 function addCube(size, scene, color, position) {
     const geometry = new THREE.BoxGeometry(size, size, size);
@@ -26,7 +36,7 @@ function addCube(size, scene, color, position) {
     cube.position.set(position[0], position[1], position[2])
     scene.add(cube);
     controlKeyboard(cube);
-    guiSettings(cube, 'Cube');
+    // guiSettings(cube, 'Cube');
 }
 
 function controlKeyboard(object) {
@@ -76,16 +86,16 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-function guiSettings(object, name) {
-    const gui = new dat.GUI();
-    const cameraFolder = gui.addFolder(name);
-    cameraFolder.add(object.position, 'z', 0, 100).listen();
-    cameraFolder.add(object.position, 'x', 0, 100).listen();
-    cameraFolder.add(object.position, 'y', 0, 100).listen();
-    cameraFolder.add(object.rotation, 'x', -5, 5).listen();
-    cameraFolder.add(object.rotation, 'y', -5, 5).listen();
-    cameraFolder.add(object.rotation, 'z', -5, 5).listen();
-}
+// function guiSettings(object, name) {
+//     const gui = new dat.GUI();
+//     const cameraFolder = gui.addFolder(name);
+//     cameraFolder.add(object.position, 'z', 0, 100).listen();
+//     cameraFolder.add(object.position, 'x', 0, 100).listen();
+//     cameraFolder.add(object.position, 'y', 0, 100).listen();
+//     cameraFolder.add(object.rotation, 'x', -5, 5).listen();
+//     cameraFolder.add(object.rotation, 'y', -5, 5).listen();
+//     cameraFolder.add(object.rotation, 'z', -5, 5).listen();
+// }
 
 function addPlane() {
     const groundGeometry = new THREE.PlaneGeometry(10, 10);
