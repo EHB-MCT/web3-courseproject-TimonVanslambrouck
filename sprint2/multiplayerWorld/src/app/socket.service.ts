@@ -13,6 +13,7 @@ import * as _ from "lodash";
 export class SocketService {
 
   public users:any = [];
+  public userData:any;
   public currentUser:ChannelId;
   private channel = geckos({
     port: 8081
