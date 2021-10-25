@@ -13,27 +13,30 @@ let onlineUsers = [];
 io.listen(PORT); // default port is 9208
 
 io.onConnection(channel => {
+    let currentUser = channel.id;
     channel.onDisconnect(() => {
-        console.log(`${channel.id} got disconnected`)
         let tempArray = _.remove(onlineUsers, function (n) {
-            return n.user == channel.id;
+            return n.user == currentUser;
         })
-        onlineUsers = tempArray;
-    })
-
-    channel.on('get users', (array) => {
-        array = onlineUsers;
     })
 
     channel.on('add user', data => {
         onlineUsers.push(data);
-        channel.emit('chat message', 'new user added')
-        console.log(onlineUsers);
+        channel.emit('chat message', 'new user added');
+        channel.emit('get users', onlineUsers);
+    })
+
+    channel.on('update user', data => {
+        let index = _.findIndex(onlineUsers, function (o) {
+            return o.user == data.user;
+        })
+        onlineUsers[index] = data;
+        channel.emit('get users', onlineUsers);
     })
 
     channel.on('chat message', data => {
-        console.log(`got ${data} from "chat message"`)
+        console.log(`got ${data} from "chat message"`);
         // emit the "chat message" data to all channels in the same room
-        io.room(channel.roomId).emit('chat message', data)
+        io.room(channel.roomId).emit('chat message', data);
     })
 })

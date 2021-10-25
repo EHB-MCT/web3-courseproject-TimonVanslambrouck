@@ -1,8 +1,15 @@
-import { SocketService } from './../socket.service';
-import { Component, OnInit } from '@angular/core';
+import {
+  SocketService
+} from './../socket.service';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 // import * as dat from 'dat.gui';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import {
+  GLTFLoader
+} from 'three/examples/jsm/loaders/GLTFLoader';
 
 @Component({
   selector: 'app-world',
@@ -17,7 +24,7 @@ export class WorldComponent implements OnInit {
     private socketService: SocketService
   ) {}
 
-  
+
 
   private scene = new THREE.Scene();
   private axesHelper = new THREE.AxesHelper(5);
@@ -29,7 +36,7 @@ export class WorldComponent implements OnInit {
 
 
   ngOnInit(): void {
-    window.addEventListener('resize', function (){
+    window.addEventListener('resize', function () {
       this.location.reload();
     })
     this.renderer.render(this.scene, this.camera);
@@ -42,18 +49,32 @@ export class WorldComponent implements OnInit {
     this.addWorld();
     this.addPlane();
     // this.addModel('assets/scene.gltf', 0.005, [0, 0, 0]);
-    this.addCube(1, 0x00ff00, [0, 0.5, 0.5]);
-    this.animate();
+    this.addCube(1, 0x00ff00, [0, 0.5, 0.5], true, 'userCube');
+    setTimeout(() => {
+      this.addOtherUsers();
+    }, 1000);
+    this.animate();  
   }
-  addCube(size: number, color: number, position: number[]) {
+  addOtherUsers() {
+    let users = this.socketService.users;
+    console.log(users);
+    users.forEach((element:any) => {
+      this.addCube(1, 0x00ff00, [element.positionX, element.positionY, element.positionZ], false, 'otherCube');
+      console.log(this.scene.children);
+    });
+  }
+  addCube(size: number, color: number, position: number[], controls:boolean, name:string) {
     const geometry = new THREE.BoxGeometry(size, size, size);
     const material = new THREE.MeshBasicMaterial({
-        color: color
+      color: color
     });
     const cube = new THREE.Mesh(geometry, material);
     cube.position.set(position[0], position[1], position[2])
+    cube.name = name;
     this.scene.add(cube);
-    this.controlKeyboard(cube);
+    if (controls) {
+      this.controlKeyboard(cube);
+    }
     this.guiSettings(cube, 'cube');
   }
 
@@ -98,40 +119,47 @@ export class WorldComponent implements OnInit {
   }
 
   controlKeyboard(object: any) {
+    const service = this.socketService;
     window.addEventListener('keydown', function (event) {
-      const KEY = event.key;
+      const KEY = event.code;
       switch (KEY) {
         case 'ArrowUp':
-        case 'z':
+        case 'KeyW':
           console.log('up');
           if (object.position.z > -4.5) {
             object.position.z -= 0.1;
+            service.updateUser(object.position.x, object.position.y, object.position.z);
           }
           break;
         case 'ArrowDown':
-        case 's':
+        case 'KeyS':
           console.log('down');
           if (object.position.z < 4.5) {
             object.position.z += 0.1;
+            service.updateUser(object.position.x, object.position.y, object.position.z);
           }
           break;
         case 'ArrowLeft':
-        case 'q':
+        case 'KeyA':
           console.log('left');
           if (object.position.x > -4.5) {
             object.position.x -= 0.1;
+            service.updateUser(object.position.x, object.position.y, object.position.z);
           }
           break;
         case 'ArrowRight':
-        case 'd':
+        case 'KeyD':
           console.log('right');
           if (object.position.x < 4.5) {
             object.position.x += 0.1;
+            service.updateUser(object.position.x, object.position.y, object.position.z);
           }
           break;
-
+        case 'Space':
+          console.log('space');
+          break
         default:
-          console.log('none');
+          console.log('none', event.code);
           break;
       }
     })
@@ -145,7 +173,7 @@ export class WorldComponent implements OnInit {
     // folder.add(object.rotation, 'x', -5, 5).listen();
     // folder.add(object.rotation, 'y', -5, 5).listen();
     // folder.add(object.rotation, 'z', -5, 5).listen();
-}
+  }
 
   animate() {
     requestAnimationFrame(this.animate.bind(this));
@@ -154,4 +182,3 @@ export class WorldComponent implements OnInit {
 
 
 }
-
