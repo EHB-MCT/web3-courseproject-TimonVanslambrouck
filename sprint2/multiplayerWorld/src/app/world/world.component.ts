@@ -18,8 +18,6 @@ import {
 })
 export class WorldComponent implements OnInit {
 
-  private users = [];
-
   constructor(
     private socketService: SocketService
   ) {}
@@ -59,7 +57,7 @@ export class WorldComponent implements OnInit {
     let users = this.socketService.users;
     console.log(users);
     users.forEach((element:any) => {
-      this.addCube(1, 0x00ff00, [element.positionX, element.positionY, element.positionZ], false, 'otherCube');
+      this.addCube(1, 0x00ff00, [element.positionX, element.positionY, element.positionZ], false, `${element.user}`);
       console.log(this.scene.children);
     });
   }
@@ -94,6 +92,7 @@ export class WorldComponent implements OnInit {
 
   addLight() {
     const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 3);
+    light.name = 'lighting';
     this.scene.add(light);
   }
 
@@ -104,6 +103,7 @@ export class WorldComponent implements OnInit {
     })
     worldMaterial.side = THREE.BackSide;
     const worldCube = new THREE.Mesh(worldGeometry, worldMaterial);
+    worldCube.name = 'world';
     this.scene.add(worldCube);
   }
 
@@ -115,6 +115,7 @@ export class WorldComponent implements OnInit {
     });
     const plane = new THREE.Mesh(groundGeometry, groundMaterial);
     plane.rotation.x = 0.5 * Math.PI;
+    plane.name = 'ground';
     this.scene.add(plane);
   }
 
@@ -125,7 +126,6 @@ export class WorldComponent implements OnInit {
       switch (KEY) {
         case 'ArrowUp':
         case 'KeyW':
-          console.log('up');
           if (object.position.z > -4.5) {
             object.position.z -= 0.1;
             service.updateUser(object.position.x, object.position.y, object.position.z);
@@ -133,7 +133,6 @@ export class WorldComponent implements OnInit {
           break;
         case 'ArrowDown':
         case 'KeyS':
-          console.log('down');
           if (object.position.z < 4.5) {
             object.position.z += 0.1;
             service.updateUser(object.position.x, object.position.y, object.position.z);
@@ -141,7 +140,6 @@ export class WorldComponent implements OnInit {
           break;
         case 'ArrowLeft':
         case 'KeyA':
-          console.log('left');
           if (object.position.x > -4.5) {
             object.position.x -= 0.1;
             service.updateUser(object.position.x, object.position.y, object.position.z);
@@ -149,7 +147,6 @@ export class WorldComponent implements OnInit {
           break;
         case 'ArrowRight':
         case 'KeyD':
-          console.log('right');
           if (object.position.x < 4.5) {
             object.position.x += 0.1;
             service.updateUser(object.position.x, object.position.y, object.position.z);
@@ -177,7 +174,14 @@ export class WorldComponent implements OnInit {
 
   animate() {
     requestAnimationFrame(this.animate.bind(this));
+    this.updatePositions();
     this.renderer.render(this.scene, this.camera);
+  }
+  updatePositions() {
+    this.socketService.users.forEach((element:any) => {
+      let object = this.scene.getObjectByName(`${element.user}`);
+      object?.position.set(element.positionX,element.positionY,element.positionZ)
+    });
   }
 
 

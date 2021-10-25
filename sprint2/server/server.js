@@ -22,8 +22,7 @@ io.onConnection(channel => {
 
     channel.on('add user', data => {
         onlineUsers.push(data);
-        channel.emit('chat message', 'new user added');
-        channel.emit('get users', onlineUsers);
+        io.room(channel.roomId).emit('get users', onlineUsers);
     })
 
     channel.on('update user', data => {
@@ -31,7 +30,7 @@ io.onConnection(channel => {
             return o.user == data.user;
         })
         onlineUsers[index] = data;
-        channel.emit('get users', onlineUsers);
+        io.room(channel.roomId).emit('get users', onlineUsers);
     })
 
     channel.on('chat message', data => {

@@ -5,6 +5,7 @@ import geckos, {
   ChannelId,
   Data
 } from '@geckos.io/client'
+import * as _ from "lodash";
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,11 @@ export class SocketService {
         return
       }
 
-      this.channel.on('get users', (data: Data) => {
+      this.channel.on('get users', (data: any) => {
+        let currentUser = this.currentUser;
+        let tempArray = _.remove(data, function (n: any) {
+          return n.user == currentUser;
+        })
         this.users = data;
       })
 
@@ -33,7 +38,7 @@ export class SocketService {
         user: this.channel.id,
         positionX: 0,
         positionY: 0.5,
-        positionZ: 0
+        positionZ: 0.5
       }
 
       this.channel.emit('add user', user)
