@@ -4,7 +4,7 @@ import {
 import geckos, {
   ChannelId,
   Data
-} from '@geckos.io/client'
+} from '@geckos.io/client';
 import * as _ from "lodash";
 
 @Injectable({
@@ -13,6 +13,7 @@ import * as _ from "lodash";
 export class SocketService {
 
   public users:any = [];
+  public removeUser = '';
   public userData:any;
   public currentUser:ChannelId;
   private channel = geckos({

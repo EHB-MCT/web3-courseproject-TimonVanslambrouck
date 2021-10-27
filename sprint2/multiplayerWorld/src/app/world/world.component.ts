@@ -10,6 +10,11 @@ import * as THREE from 'three';
 import {
   GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as _ from 'lodash';
+import {
+  ChannelId
+} from '@geckos.io/client'
+import { Object3D } from 'three';
 
 @Component({
   selector: 'app-world',
@@ -38,6 +43,7 @@ export class WorldComponent implements OnInit {
       this.location.reload();
     })
     this.renderer.render(this.scene, this.camera);
+    this.axesHelper.name = 'axes';
     this.scene.add(this.axesHelper);
     this.camera.position.set(0, 2, 4);
     this.camera.rotation.x = -0.5;
@@ -48,14 +54,13 @@ export class WorldComponent implements OnInit {
     this.addPlane();
     // this.addModel('assets/scene.gltf', 0.005, [0, 0, 0]);
     this.addCube(1, 0x00ff00, [0, 0.5, 0.5], true, 'userCube');
-    setTimeout(() => {
-      this.addOtherUsers();
-    }, 1000);
+    // setTimeout(() => {
+    //   this.addOtherUsers();
+    // }, 1500);
     this.animate();  
   }
   addOtherUsers() {
     let users = this.socketService.users;
-    console.log(users);
     users.forEach((element:any) => {
       this.addCube(1, 0x00ff00, [element.positionX, element.positionY, element.positionZ], false, `${element.user}`);
       console.log(this.scene.children);
@@ -178,11 +183,38 @@ export class WorldComponent implements OnInit {
     this.renderer.render(this.scene, this.camera);
   }
   updatePositions() {
-    this.socketService.users.forEach((element:any) => {
+    let objects = this.getObjects(); 
+    this.socketService.users.forEach((element: any) => {
       let object = this.scene.getObjectByName(`${element.user}`);
-      object?.position.set(element.positionX,element.positionY,element.positionZ)
+      if (object == undefined) {
+        this.addCube(1, 0x00ff00, [0, 0.5, 0.5], false, element.user);
+      } else {
+        object?.position.set(element.positionX, element.positionY, element.positionZ);
+        let tempArray = _.remove(objects, function (n:any) {
+          return n === object?.name;
+        })
+      }
     });
+    if (objects.length > 0) {
+      this.removeObjects(objects)
+    }
   }
-
+  removeObjects(objects: string[]) {
+    objects.forEach(element => {
+      let removedObject = this.scene.getObjectByName(element);
+      this.scene.remove(removedObject!);
+    });
+    
+  }
+  getObjects() {
+    let objects: string[] = [];
+    let sceneChildren = this.scene.children;
+    sceneChildren.forEach(element => {
+      if (element.name.length == 24) {
+        objects.push(element.name);
+      }
+    });
+    return objects
+  }
 
 }
