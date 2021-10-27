@@ -18,6 +18,7 @@ io.onConnection(channel => {
         let tempArray = _.remove(onlineUsers, function (n) {
             return n.user == currentUser;
         })
+        io.room(channel.roomId).emit('get users', onlineUsers);
     })
 
     channel.on('add user', data => {
